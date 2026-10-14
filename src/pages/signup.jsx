@@ -1,38 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { signup, clearError } from '../features/auth/authSlice';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Signup() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { isLoggedIn, error } = useSelector(state => state.auth);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate]);
+
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
 
     function handleSignup(e) {
         e.preventDefault();
-
-        alert('Signup form submitted!');
+        if (password.length < 8) {
+            alert('Password must be at least 8 characters!');
+            return;
+        }
+        dispatch(signup({ name, email, password }));
     }
 
     return (
-        <div>
-            <h2>Signup</h2>
+        <div className="auth-container">
+            <div className="auth-card">
+                <h2>Sign Up</h2>
+                {error && <p className="error-message">{error}</p>}
 
-            <form onSubmit={handleSignup}>
-                <input
-                    type="text"
-                    placeholder="Enter name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
+                <form onSubmit={handleSignup}>
+                    <div className="form-group">
+                        <label>Name</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                <input
-                    type="email"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                <button type="submit">Signup</button>
-            </form>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            placeholder="Create a password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            minLength={6}
+                        />
+                    </div>
+                    <button type="submit" className="btn-primary">Sign Up</button>
+                </form>
+
+                <p className="auth-switch">
+                    Already have an account? <Link to="/login">Login</Link>
+                </p>
+            </div>
         </div>
     );
 }
