@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
+import { registerEvent, cancelRegistration, clearMessage } from '../features/registrations/registrationsSlice';
 
 const API_KEY = import.meta.env.VITE_TICKETMASTER_API_KEY;
 const BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
 
 function EventDetails() {
     const { id } = useParams();
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector(state => state.auth);
+    const { registrations, message } = useSelector(state => state.registrations);
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const isRegistered = registrations.some(
+        item => item.userEmail === currentUser.email && item.eventId === id
+    );
 
     useEffect(() => {
         async function getEvent() {
@@ -31,6 +40,7 @@ function EventDetails() {
                 const venue = data._embedded?.venues?.[0];
 
                 setEvent({
+                    id: data.id,
                     name: data.name,
                     date: data.dates?.start?.localDate || 'TBA',
                     time: data.dates?.start?.localTime || '',
@@ -54,7 +64,8 @@ function EventDetails() {
         }
 
         getEvent();
-    }, [id]);
+        dispatch(clearMessage());
+    }, [id, dispatch]);
 
     function formatDate(dateStr) {
         if (!dateStr || dateStr === 'TBA') return 'TBA';
@@ -65,6 +76,20 @@ function EventDetails() {
             month: 'long',
             day: 'numeric'
         });
+    }
+
+    function handleRegister() {
+        dispatch(registerEvent({
+            userEmail: currentUser.email,
+            event
+        }));
+    }
+
+    function handleCancel() {
+        dispatch(cancelRegistration({
+            userEmail: currentUser.email,
+            eventId: event.id
+        }));
     }
 
     function formatTime(timeStr) {
@@ -117,11 +142,25 @@ function EventDetails() {
                         </div>
                     )}
 
-                    {event.url && (
-                        <a href={event.url} target="_blank" rel="noreferrer" className="btn-primary details-ticket-btn">
-                            Buy Tickets
-                        </a>
-                    )}
+                    {message && <p className="feedback-message">{message}</p>}
+
+                    <div className="details-actions">
+                        {isRegistered ? (
+                            <button type="button" className="btn-cancel" onClick={handleCancel}>
+                                Cancel Registration
+                            </button>
+                        ) : (
+                            <button type="button" className="btn-primary details-ticket-btn" onClick={handleRegister}>
+                                Register for Event
+                            </button>
+                        )}
+
+                        {event.url && (
+                            <a href={event.url} target="_blank" rel="noreferrer" className="details-ticket-link">
+                                Buy Tickets
+                            </a>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
