@@ -369,3 +369,129 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.event-details-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #4a90d9;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.event-details-card {
+    display: grid;
+    grid-template-columns: minmax(280px, 42%) 1fr;
+    overflow: hidden;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.event-details-image {
+    min-height: 360px;
+    background-color: #eee;
+}
+
+.event-details-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-details-content {
+    padding: 32px;
+}
+
+.event-details-content h1 {
+    margin-bottom: 24px;
+    color: #222;
+    font-size: 28px;
+    line-height: 1.2;
+}
+
+.event-details-meta {
+    display: grid;
+    gap: 16px;
+}
+
+.meta-item {
+    display: grid;
+    gap: 4px;
+}
+
+.meta-item strong,
+.event-details-info strong {
+    color: #555;
+    font-size: 13px;
+}
+
+.meta-item span {
+    color: #222;
+    font-size: 15px;
+}
+
+.event-details-info {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    line-height: 1.6;
+}
+
+.event-details-info p {
+    margin-top: 6px;
+    white-space: pre-line;
+}
+
+.event-details-actions {
+    margin-top: 28px;
+}
+
+.event-details-actions .btn-primary {
+    display: inline-block;
+    width: auto;
+    text-decoration: none;
+}
+
+.event-details-state {
+    max-width: 500px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.retry-button {
+    width: auto;
+    padding: 10px 20px;
+}
+
+@media (max-width: 600px) {
+    .event-details-page {
+        padding: 20px 16px 32px;
+    }
+
+    .event-details-card {
+        grid-template-columns: 1fr;
+    }
+
+    .event-details-image {
+        min-height: 240px;
+        max-height: 320px;
+    }
+
+    .event-details-content {
+        padding: 24px 20px;
+    }
+
+    .event-details-content h1 {
+        font-size: 24px;
+    }
+}
