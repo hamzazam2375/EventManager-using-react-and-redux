@@ -1,34 +1,41 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchEvents, setKeyword, setCategory } from '../features/events/eventsSlice';
-import { Link } from 'react-router-dom';
+import { fetchEvents, setKeyword, setCategory, setUpcoming } from '../features/events/eventsSlice';
+import EventCard from '../components/EventCard';
 
 const categories = ['All', 'Music', 'Sports', 'Arts & Theatre', 'Film', 'Miscellaneous'];
 
 function Events() {
     const dispatch = useDispatch();
-    const { events, loading, error, keyword, category, currentPage, totalPages } = useSelector(state => state.events);
+    const { events, loading, error, keyword, category, upcoming, currentPage, totalPages } = useSelector(state => state.events);
     const [searchInput, setSearchInput] = useState(keyword);
 
     useEffect(() => {
-        dispatch(fetchEvents({ keyword, category: category === 'All' ? '' : category, page: 0 }));
-    }, [dispatch, keyword, category]);
+        dispatch(fetchEvents({
+            keyword,
+            category: category === 'All' ? '' : category,
+            page: 0,
+            upcoming
+        }));
+    }, [dispatch, keyword, category, upcoming]);
 
     function handleSearch(e) {
         e.preventDefault();
         dispatch(setKeyword(searchInput));
     }
+
     function handleCategoryChange(cat) {
         dispatch(setCategory(cat));
     }
+
     function handlePageChange(page) {
-        dispatch(fetchEvents({ keyword, category: category === 'All' ? '' : category, page }));
+        dispatch(fetchEvents({
+            keyword,
+            category: category === 'All' ? '' : category,
+            page,
+            upcoming
+        }));
         window.scrollTo(0, 0);
-    }
-    function formatDate(dateStr) {
-        if (!dateStr || dateStr === 'TBA') return 'TBA';
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
     }
 
     return (
@@ -46,11 +53,28 @@ function Events() {
                 </form>
 
                 <div className="category-filters">
+                    <button
+                        className={`category-btn ${!upcoming ? 'active' : ''}`}
+                        onClick={() => dispatch(setUpcoming(false))}
+                    >
+                        All Events
+                    </button>
+                    <button
+                        className={`category-btn ${upcoming ? 'active' : ''}`}
+                        onClick={() => dispatch(setUpcoming(true))}
+                    >
+                        Upcoming
+                    </button>
+                </div>
+
+                <div className="category-filters">
                     {categories.map(cat => (
                         <button
                             key={cat}
                             className={`category-btn ${(category === cat || (category === '' && cat === 'All')) ? 'active' : ''}`}
-                            onClick={() => handleCategoryChange(cat)}>{cat}
+                            onClick={() => handleCategoryChange(cat)}
+                        >
+                            {cat}
                         </button>
                     ))}
                 </div>
@@ -64,18 +88,7 @@ function Events() {
 
             <div className="events-grid">
                 {events.map(event => (
-                    <Link to={`/event/${event.id}`} key={event.id} className="event-card">
-                        <div className="event-image">
-                            {event.image && <img src={event.image} alt={event.name} />}
-                        </div>
-                        <div className="event-info">
-                            <h3>{event.name}</h3>
-                            <p className="event-date">{formatDate(event.date)}</p>
-                            <p className="event-venue">{event.venue}</p>
-                            <p className="event-location">{[event.city, event.state].filter(Boolean).join(', ')}</p>
-                            {event.category && <span className="event-category">{event.category}</span>}
-                        </div>
-                    </Link>
+                    <EventCard key={event.id} event={event} />
                 ))}
             </div>
 

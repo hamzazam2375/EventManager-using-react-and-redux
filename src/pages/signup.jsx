@@ -7,6 +7,7 @@ function Signup() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [formError, setFormError] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { isLoggedIn, error } = useSelector(state => state.auth);
@@ -23,18 +24,25 @@ function Signup() {
 
     function handleSignup(e) {
         e.preventDefault();
-        if (password.length < 8) {
-            alert('Password must be at least 8 characters!');
+
+        if (name.trim() === '') {
+            setFormError('Please enter your name.');
             return;
         }
-        dispatch(signup({ name, email, password }));
+        if (password.length < 8) {
+            setFormError('Password must be at least 8 characters.');
+            return;
+        }
+
+        setFormError('');
+        dispatch(signup({ name: name.trim(), email, password }));
     }
 
     return (
         <div className="auth-container">
             <div className="auth-card">
                 <h2>Sign Up</h2>
-                {error && <p className="error-message">{error}</p>}
+                {(formError || error) && <p className="error-message">{formError || error}</p>}
 
                 <form onSubmit={handleSignup}>
                     <div className="form-group">
@@ -63,11 +71,11 @@ function Signup() {
                         <label>Password</label>
                         <input
                             type="password"
-                            placeholder="Create a password"
+                            placeholder="At least 8 characters"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            minLength={6}
+                            minLength={8}
                         />
                     </div>
                     <button type="submit" className="btn-primary">Sign Up</button>
