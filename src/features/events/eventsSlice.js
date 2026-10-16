@@ -5,7 +5,7 @@ const BASE_URL = 'https://app.ticketmaster.com/discovery/v2';
 
 export const fetchEvents = createAsyncThunk(
     'events/fetchEvents',
-    async ({ keyword = '', category = '', page = 0 }) => {
+    async ({ keyword = '', category = '', page = 0, upcoming = false }) => {
         let url = `${BASE_URL}/events.json?apikey=${API_KEY}&size=20&page=${page}`;
 
         if (keyword) {
@@ -13,6 +13,10 @@ export const fetchEvents = createAsyncThunk(
         }
         if (category) {
             url += `&classificationName=${encodeURIComponent(category)}`;
+        }
+        if (upcoming) {
+            const now = new Date().toISOString().split('.')[0] + 'Z';
+            url += `&startDateTime=${now}&sort=date,asc`;
         }
 
         const response = await fetch(url);
@@ -50,6 +54,7 @@ const initialState = {
     error: null,
     keyword: '',
     category: '',
+    upcoming: false,
     currentPage: 0,
     totalPages: 0
 };
@@ -63,6 +68,9 @@ const eventsSlice = createSlice({
         },
         setCategory(state, action) {
             state.category = action.payload;
+        },
+        setUpcoming(state, action) {
+            state.upcoming = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -84,5 +92,5 @@ const eventsSlice = createSlice({
     }
 });
 
-export const { setKeyword, setCategory } = eventsSlice.actions;
+export const { setKeyword, setCategory, setUpcoming } = eventsSlice.actions;
 export default eventsSlice.reducer;

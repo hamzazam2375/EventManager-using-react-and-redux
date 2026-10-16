@@ -221,6 +221,7 @@ img {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    margin-bottom: 10px;
 }
 
 .category-btn {
@@ -273,6 +274,12 @@ img {
 
 .event-card:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.event-card a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
 }
 
 .event-image {
@@ -439,9 +446,67 @@ img {
 .details-ticket-btn {
     display: inline-block;
     width: auto;
-    margin-top: 20px;
+    margin-top: 0;
     text-decoration: none;
     text-align: center;
+}
+
+.details-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.details-ticket-link {
+    color: #4a90d9;
+    font-size: 14px;
+}
+
+.feedback-message {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background-color: #e8f6ee;
+    color: #1e7a46;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.btn-cancel {
+    padding: 10px 16px;
+    background: white;
+    color: #c33;
+    border: 1px solid #e0a0a0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-cancel:hover {
+    background-color: #c33;
+    color: white;
+    border-color: #c33;
+}
+
+.section-title {
+    margin: 24px 0 16px;
+    font-size: 20px;
+    color: #222;
+}
+
+.my-event-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.my-event-card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.my-event-card .btn-cancel {
+    margin: 0 14px 14px;
 }
 
 @media (max-width: 768px) {
@@ -498,8 +563,11 @@ img {
         font-size: 22px;
     }
 
-    .details-ticket-btn {
+    .details-ticket-btn,
+    .details-actions .btn-cancel,
+    .details-ticket-link {
         width: 100%;
+        text-align: center;
     }
 }
 

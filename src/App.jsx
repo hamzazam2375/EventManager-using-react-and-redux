@@ -3,6 +3,7 @@ import Login from './pages/login';
 import Signup from './pages/signup';
 import Events from './pages/Events';
 import EventDetails from './pages/EventDetails';
+import MyEvents from './pages/MyEvents';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -25,7 +26,7 @@ function App() {
                 } />
                 <Route path="/my-events" element={
                     <ProtectedRoute>
-                        <h2 style={{ padding: '20px' }}>My Events page coming soon...</h2>
+                        <MyEvents />
                     </ProtectedRoute>
                 } />
                 <Route path="*" element={<Navigate to="/" />} />
