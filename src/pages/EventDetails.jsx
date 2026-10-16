@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 const API_KEY = import.meta.env.VITE_TICKETMASTER_API_KEY;
@@ -10,98 +10,73 @@ function EventDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const getEvent = useCallback(async (signal) => {
-        if (signal.aborted) return;
+    useEffect(() => {
+        async function getEvent() {
+            try {
+                setLoading(true);
+                setError(null);
 
-        if (!id) {
-            setError('Event not found');
-            setLoading(false);
-            return;
-        }
+                if (!API_KEY) {
+                    setError('Ticketmaster API key is not configured');
+                    setLoading(false);
+                    return;
+                }
 
-        if (!API_KEY) {
-            setError('Ticketmaster API key is not configured');
-            setLoading(false);
-            return;
-        }
+                const response = await fetch(`${BASE_URL}/events/${id}.json?apikey=${API_KEY}`);
+                if (!response.ok) {
+                    throw new Error('Could not load event');
+                }
 
-        try {
-            setLoading(true);
-            setError(null);
-            setEvent(null);
-            const response = await fetch(`${BASE_URL}/events/${encodeURIComponent(id)}.json?apikey=${API_KEY}`, { signal });
+                const data = await response.json();
+                const venue = data._embedded?.venues?.[0];
 
-            if (!response.ok) {
-                throw new Error(`Event request failed with status ${response.status}`);
-            }
-
-            const data = await response.json();
-            setEvent({
-                id: data.id,
-                name: data.name || 'Untitled event',
-                date: data.dates?.start?.localDate || 'TBA',
-                time: data.dates?.start?.localTime || '',
-                image: data.images?.find(img => img.width > 500)?.url || data.images?.[0]?.url || '',
-                venue: data._embedded?.venues?.[0]?.name || 'TBA',
-                city: data._embedded?.venues?.[0]?.city?.name || '',
-                state: data._embedded?.venues?.[0]?.state?.name || '',
-                country: data._embedded?.venues?.[0]?.country?.name || '',
-                address: data._embedded?.venues?.[0]?.address?.line1 || '',
-                category: data.classifications?.[0]?.segment?.name || '',
-                genre: data.classifications?.[0]?.genre?.name || '',
-                priceRange: data.priceRanges?.[0] || null,
-                url: data.url || '',
-                info: data.info || data.pleaseNote || '',
-                status: data.dates?.status?.code || ''
-            });
-        } catch (err) {
-            if (err.name !== 'AbortError') {
+                setEvent({
+                    name: data.name,
+                    date: data.dates?.start?.localDate || 'TBA',
+                    time: data.dates?.start?.localTime || '',
+                    image: data.images?.[0]?.url || '',
+                    venue: venue?.name || 'TBA',
+                    city: venue?.city?.name || '',
+                    state: venue?.state?.name || '',
+                    country: venue?.country?.name || '',
+                    address: venue?.address?.line1 || '',
+                    category: data.classifications?.[0]?.segment?.name || '',
+                    priceRange: data.priceRanges?.[0] || null,
+                    url: data.url || '',
+                    info: data.info || data.pleaseNote || '',
+                    status: data.dates?.status?.code || ''
+                });
+            } catch (err) {
                 setError('Failed to load event details. Please try again.');
-            }
-        } finally {
-            if (!signal.aborted) {
+            } finally {
                 setLoading(false);
             }
         }
-    }, [id]);
 
-    useEffect(() => {
-        const controller = new AbortController();
-        queueMicrotask(() => getEvent(controller.signal));
-        return () => controller.abort();
-    }, [getEvent]);
+        getEvent();
+    }, [id]);
 
     function formatDate(dateStr) {
         if (!dateStr || dateStr === 'TBA') return 'TBA';
-        const date = new Date(`${dateStr}T00:00:00`);
-        if (Number.isNaN(date.getTime())) return 'TBA';
-        return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     }
 
     function formatTime(timeStr) {
         if (!timeStr) return '';
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        if (Number.isNaN(hours) || Number.isNaN(minutes)) return timeStr;
-        const date = new Date(2000, 0, 1, hours, minutes);
+        const [hours, minutes] = timeStr.split(':');
+        const date = new Date();
+        date.setHours(hours, minutes);
         return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     }
 
-    function formatStatus(status) {
-        if (status === 'onsale') return 'On Sale';
-        return status.replace(/([a-z])([A-Z])/g, '$1 $2');
-    }
-
     if (loading) return <p className="loading-text">Loading event details...</p>;
-    if (error) {
-        return (
-            <div className="event-details-state">
-                <p className="error-text">{error}</p>
-                <button type="button" className="btn-primary retry-button" onClick={() => getEvent(new AbortController().signal)}>
-                    Try again
-                </button>
-            </div>
-        );
-    }
+    if (error) return <p className="error-text">{error}</p>;
     if (!event) return <p className="error-text">Event not found</p>;
 
     const location = [event.address, event.city, event.state, event.country].filter(Boolean).join(', ');
@@ -120,61 +95,33 @@ function EventDetails() {
                 <div className="event-details-content">
                     <h1>{event.name}</h1>
 
+                    {event.category && <span className="event-category">{event.category}</span>}
+
                     <div className="event-details-meta">
-                        <div className="meta-item">
-                            <strong>Date</strong>
-                            <span>{formatDate(event.date)}</span>
-                        </div>
-                        {event.time && (
-                            <div className="meta-item">
-                                <strong>Time</strong>
-                                <span>{formatTime(event.time)}</span>
-                            </div>
-                        )}
-                        <div className="meta-item">
-                            <strong>Venue</strong>
-                            <span>{event.venue}</span>
-                        </div>
-                        {location && (
-                            <div className="meta-item">
-                                <strong>Location</strong>
-                                <span>{location}</span>
-                            </div>
-                        )}
-                        {event.category && (
-                            <div className="meta-item">
-                                <strong>Category</strong>
-                                <span>{event.category}{event.genre ? ` / ${event.genre}` : ''}</span>
-                            </div>
-                        )}
+                        <p><strong>Date:</strong> {formatDate(event.date)}</p>
+                        {event.time && <p><strong>Time:</strong> {formatTime(event.time)}</p>}
+                        <p><strong>Venue:</strong> {event.venue}</p>
+                        {location && <p><strong>Location:</strong> {location}</p>}
                         {event.priceRange && (
-                            <div className="meta-item">
-                                <strong>Price</strong>
-                                <span>${event.priceRange.min} - ${event.priceRange.max} {event.priceRange.currency}</span>
-                            </div>
+                            <p>
+                                <strong>Price:</strong> ${event.priceRange.min} - ${event.priceRange.max} {event.priceRange.currency}
+                            </p>
                         )}
-                        {event.status && (
-                            <div className="meta-item">
-                                <strong>Status</strong>
-                                <span className={`status-${event.status}`}>{formatStatus(event.status)}</span>
-                            </div>
-                        )}
+                        {event.status && <p><strong>Status:</strong> {event.status}</p>}
                     </div>
 
                     {event.info && (
                         <div className="event-details-info">
-                            <strong>Info</strong>
+                            <h3>About</h3>
                             <p>{event.info}</p>
                         </div>
                     )}
 
-                    <div className="event-details-actions">
-                        {event.url && (
-                            <a href={event.url} target="_blank" rel="noopener noreferrer" className="btn-primary">
-                                Buy Tickets on Ticketmaster
-                            </a>
-                        )}
-                    </div>
+                    {event.url && (
+                        <a href={event.url} target="_blank" rel="noreferrer" className="btn-primary details-ticket-btn">
+                            Buy Tickets
+                        </a>
+                    )}
                 </div>
             </div>
         </div>
