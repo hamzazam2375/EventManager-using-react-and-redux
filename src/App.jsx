@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import Login from './pages/login';
 import Signup from './pages/signup';
 import Events from './pages/Events';
@@ -7,8 +7,8 @@ import MyEvents from './pages/MyEvents';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
-    return (
+function App(){
+    return(
         <BrowserRouter>
             <Navbar />
             <Routes>

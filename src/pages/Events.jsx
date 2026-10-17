@@ -1,34 +1,34 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchEvents, setKeyword, setCategory, setUpcoming } from '../features/events/eventsSlice';
+import {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchEvents, setKeyword, setCategory, setUpcoming} from '../features/events/eventsSlice';
 import EventCard from '../components/EventCard';
 
 const categories = ['All', 'Music', 'Sports', 'Arts & Theatre', 'Film', 'Miscellaneous'];
 
-function Events() {
+function Events(){
     const dispatch = useDispatch();
-    const { events, loading, error, keyword, category, upcoming, currentPage, totalPages } = useSelector(state => state.events);
+    const {events, loading, error, keyword, category, upcoming, currentPage, totalPages} = useSelector(state => state.events);
     const [searchInput, setSearchInput] = useState(keyword);
 
     useEffect(() => {
         dispatch(fetchEvents({
             keyword,
             category: category === 'All' ? '' : category,
-            page: 0,
+            page:0,
             upcoming
         }));
-    }, [dispatch, keyword, category, upcoming]);
+    },[dispatch, keyword, category, upcoming]);
 
-    function handleSearch(e) {
+    function handleSearch(e){
         e.preventDefault();
         dispatch(setKeyword(searchInput));
     }
 
-    function handleCategoryChange(cat) {
+    function handleCategoryChange(cat){
         dispatch(setCategory(cat));
     }
 
-    function handlePageChange(page) {
+    function handlePageChange(page){
         dispatch(fetchEvents({
             keyword,
             category: category === 'All' ? '' : category,
@@ -51,7 +51,6 @@ function Events() {
                     />
                     <button type="submit">Search</button>
                 </form>
-
                 <div className="category-filters">
                     <button
                         className={`category-btn ${!upcoming ? 'active' : ''}`}

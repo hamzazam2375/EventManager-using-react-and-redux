@@ -1,22 +1,21 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../features/auth/authSlice';
+import {Link, useNavigate} from 'react-router-dom';
+import {useSelector, useDispatch} from 'react-redux';
+import {logout} from '../features/auth/authSlice';
 
 function Navbar() {
-    const { isLoggedIn, currentUser } = useSelector(state => state.auth);
+    const {isLoggedIn, currentUser} = useSelector(state=>state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    function handleLogout() {
+    function handleLogout(){
         dispatch(logout());
         navigate('/login');
     }
-    if (!isLoggedIn) return null;
+    if(!isLoggedIn) return null;
 
-    return (
+    return(
         <nav className="navbar">
             <Link to="/" className="navbar-brand">EventManager</Link>
-
             <div className="navbar-links">
                 <Link to="/">Events</Link>
                 <Link to="/my-events">My Events</Link>

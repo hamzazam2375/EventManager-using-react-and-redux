@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { login, clearError } from '../features/auth/authSlice';
-import { Link, useNavigate } from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {login, clearError} from '../features/auth/authSlice';
+import {Link, useNavigate} from 'react-router-dom';
 
-function Login() {
+function Login(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { isLoggedIn, error } = useSelector(state => state.auth);
+    const {isLoggedIn, error} = useSelector(state => state.auth);
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if(isLoggedIn){
             navigate('/');
         }
-    }, [isLoggedIn, navigate]);
+    },[isLoggedIn, navigate]);
 
     useEffect(() => {
         dispatch(clearError());
-    }, [dispatch]);
+    },[dispatch]);
 
-    function handleLogin(e) {
+    function handleLogin(e){
         e.preventDefault();
-        dispatch(login({ email, password }));
+        dispatch(login({email, password}));
     }
 
     return (
@@ -30,7 +30,6 @@ function Login() {
             <div className="auth-card">
                 <h2>Login</h2>
                 {error && <p className="error-message">{error}</p>}
-
                 <form onSubmit={handleLogin}>
                     <div className="form-group">
                         <label>Email</label>

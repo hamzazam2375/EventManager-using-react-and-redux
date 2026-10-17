@@ -1,49 +1,48 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { signup, clearError } from '../features/auth/authSlice';
-import { Link, useNavigate } from 'react-router-dom';
+import {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {signup, clearError} from '../features/auth/authSlice';
+import {Link, useNavigate} from 'react-router-dom';
 
-function Signup() {
+function Signup(){
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [formError, setFormError] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { isLoggedIn, error } = useSelector(state => state.auth);
+    const {isLoggedIn, error} = useSelector(state => state.auth);
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if(isLoggedIn){
             navigate('/');
         }
-    }, [isLoggedIn, navigate]);
+    },[isLoggedIn, navigate]);
 
     useEffect(() => {
         dispatch(clearError());
-    }, [dispatch]);
+    },[dispatch]);
 
-    function handleSignup(e) {
+    function handleSignup(e){
         e.preventDefault();
 
-        if (name.trim() === '') {
+        if(name.trim() === ''){
             setFormError('Please enter your name.');
             return;
         }
-        if (password.length < 8) {
+        if(password.length < 8){
             setFormError('Password must be at least 8 characters.');
             return;
         }
 
         setFormError('');
-        dispatch(signup({ name: name.trim(), email, password }));
+        dispatch(signup({name:name.trim(), email, password}));
     }
 
-    return (
+    return(
         <div className="auth-container">
             <div className="auth-card">
                 <h2>Sign Up</h2>
                 {(formError || error) && <p className="error-message">{formError || error}</p>}
-
                 <form onSubmit={handleSignup}>
                     <div className="form-group">
                         <label>Name</label>
@@ -55,7 +54,6 @@ function Signup() {
                             required
                         />
                     </div>
-
                     <div className="form-group">
                         <label>Email</label>
                         <input
@@ -66,7 +64,6 @@ function Signup() {
                             required
                         />
                     </div>
-
                     <div className="form-group">
                         <label>Password</label>
                         <input
@@ -80,7 +77,6 @@ function Signup() {
                     </div>
                     <button type="submit" className="btn-primary">Sign Up</button>
                 </form>
-
                 <p className="auth-switch">
                     Already have an account? <Link to="/login">Login</Link>
                 </p>

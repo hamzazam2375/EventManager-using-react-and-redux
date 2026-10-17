@@ -1,17 +1,17 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { cancelRegistration, clearMessage } from '../features/registrations/registrationsSlice';
-import { useEffect } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {cancelRegistration, clearMessage} from '../features/registrations/registrationsSlice';
+import {useEffect} from 'react';
 import EventCard from '../components/EventCard';
 
-function MyEvents() {
+function MyEvents(){
     const dispatch = useDispatch();
-    const { currentUser } = useSelector(state => state.auth);
-    const { registrations, message } = useSelector(state => state.registrations);
+    const {currentUser} = useSelector(state => state.auth);
+    const {registrations, message} = useSelector(state => state.registrations);
 
     const myEvents = registrations.filter(item => item.userEmail === currentUser.email);
 
-    function isUpcoming(dateStr) {
-        if (!dateStr || dateStr === 'TBA') return true;
+    function isUpcoming(dateStr){
+        if(!dateStr || dateStr === 'TBA') return true;
         const eventDate = new Date(dateStr);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -23,21 +23,21 @@ function MyEvents() {
 
     useEffect(() => {
         dispatch(clearMessage());
-    }, [dispatch]);
+    },[dispatch]);
 
-    function handleCancel(eventId) {
+    function handleCancel(eventId){
         dispatch(cancelRegistration({
             userEmail: currentUser.email,
             eventId
         }));
     }
 
-    function renderList(events, showCancel) {
-        if (events.length === 0) {
+    function renderList(events, showCancel){
+        if(events.length === 0){
             return <p className="no-results">No events in this list.</p>;
         }
 
-        return (
+        return(
             <div className="events-grid">
                 {events.map(event => (
                     <EventCard
@@ -50,27 +50,24 @@ function MyEvents() {
                             >
                                 Cancel Registration
                             </button>
-                        ) : null}
+                        ):null}
                     />
                 ))}
             </div>
         );
     }
 
-    return (
+    return(
         <div className="events-page">
             <h1>My Events</h1>
             {message && <p className="feedback-message">{message}</p>}
-
             {myEvents.length === 0 && (
                 <p className="no-results">You have not registered for any events yet.</p>
             )}
-
             {myEvents.length > 0 && (
                 <>
                     <h2 className="section-title">Upcoming</h2>
                     {renderList(upcoming, true)}
-
                     <h2 className="section-title">Completed</h2>
                     {renderList(completed, false)}
                 </>

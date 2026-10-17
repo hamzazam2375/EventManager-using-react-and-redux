@@ -1,22 +1,22 @@
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
-function EventCard({ event, action }) {
+function EventCard({event, action}){
     const id = event.id || event.eventId;
     const location = [event.city, event.state].filter(Boolean).join(', ');
 
-    function formatDate(dateStr) {
+    function formatDate(dateStr){
         if (!dateStr || dateStr === 'TBA') return 'TBA';
         const date = new Date(dateStr);
-        return date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
+        return date.toLocaleDateString('en-US',{
+            weekday:'short',
+            year:'numeric',
+            month:'short',
+            day:'numeric'
         });
     }
 
     return (
-        <div className={action ? 'event-card my-event-card' : 'event-card'}>
+        <div className={action ? 'event-card my-event-card':'event-card'}>
             <Link to={`/event/${id}`}>
                 <div className="event-image">
                     {event.image && <img src={event.image} alt={event.name} />}
@@ -33,5 +33,4 @@ function EventCard({ event, action }) {
         </div>
     );
 }
-
 export default EventCard;
